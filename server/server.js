@@ -23,7 +23,20 @@ app.post('/contacts',async(req,res)=>{
 })
 
 // update contact
-
+app.put('/contacts/:cid', async(req,res) => {
+    try{
+        const{ cid }= req.params;
+        const{contactname,phonenumber}=req.body
+        const value = await contacts.query(
+            `UPDATE contacts
+            SET contactname = $1,
+                phonenumber= $2
+            WHERE cid = $3
+            RETURNING *`,[contactname,phonenumber,cid])
+        res.status(200).json(value.rows[0])
+    } catch(err){
+        console.log(err.message)
+})
 
 // delete contact
 
