@@ -27,5 +27,36 @@ app.post('/contacts',async(req,res)=>{
 
 // delete contact
 
-
+app.delete('/delete/:cid', async(req,res)=>{
+    try{
+        const { cid } = req.params;
+        const value = await contacts.query("DELETE FROM contacts WHERE cid = $1 RETURNING *",[cid])
+        res.status(200).json(value.rows)
+    } catch (err){
+        console.log(err.message)
+    }
+})
 // read all contact 
+app.get('/contacts', async(req,res)=>{
+    try{
+        const value = await contacts.query("SELECT * FROM contacts;")
+        res.status(200).json(value.rows)
+    } catch(err){
+        console.log(err.message)
+    }
+    
+})
+
+// get a contact 
+app.get('/contacts/:cid', async(req,res)=>{
+    try{
+        const { cid } = req.params;
+        const value = await contacts.query("SELECT cid, contactname, phonenumber FROM contacts WHERE cid = $1", [cid]);
+        if (value.rows.length === 0){
+            return res.status(404).json({error:"Contact empty"})
+        }
+        return res.json(value.rows[0])
+    } catch (err) {
+        console.log(err.message)
+    }
+})
